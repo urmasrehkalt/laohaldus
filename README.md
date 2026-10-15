@@ -2,17 +2,14 @@
 
 Java konsoolirakendus väikese poe laoseisu haldamiseks (TAK25 koolitöö).
 
-## Nõuded
-
-- Java 21
-- Maven 3.9 või uuem
-
-## Käivitamine
+## Kiire start
 
 ```
-mvn -q compile
-java -cp target/classes laohaldus.Main
+./run.sh
 ```
+
+See kompileerib koodi ja käivitab rakenduse. Skript leiab Homebrew'ga paigaldatud Java ise
+üles, isegi kui `java` ei ole PATH-is. Käivitada saab ükskõik millisest kaustast.
 
 Rakendus alustab nelja näidistootega. Menüüst saab tooteid vaadata, lisada, koguseid muuta,
 nime järgi otsida ja laoseisu koguväärtust näha.
@@ -20,7 +17,23 @@ nime järgi otsida ja laoseisu koguväärtust näha.
 ## Testid
 
 ```
-mvn test
+./run.sh test
+```
+
+(sama mis `mvn test`)
+
+## Nõuded
+
+- Java 21 või uuem. Puudumisel: `brew install openjdk@21`
+- Maven 3.9 või uuem, ainult testide jaoks (`brew install maven`)
+
+## Käsitsi käivitamine
+
+Kui `run.sh` ei sobi (nt Windows), tee samad sammud käsitsi:
+
+```
+mvn -q compile
+java -cp target/classes laohaldus.Main
 ```
 
 ## Ülesehitus
@@ -34,3 +47,4 @@ mvn test
 | `ConsoleMenu` | konsoolimenüü ja kasutaja sisendi töötlus |
 | `SampleData` | näidistooted |
 | `Main` | paneb osad kokku ja käivitab menüü |
+| `run.sh` | käivitab rakenduse või testid ühe käsuga |
