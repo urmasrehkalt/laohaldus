@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -70,5 +71,103 @@ class InventoryTest {
 
         assertThrows(UnsupportedOperationException.class, () -> all.add(phone()));
         assertEquals(1, inventory.size());
+    }
+
+    private void addThreeProducts() {
+        inventory.addProduct(milk());
+        inventory.addProduct(phone());
+        inventory.addProduct(new FoodProduct("Piimašokolaad", 2.50, 4, LocalDate.of(2027, 1, 1)));
+    }
+
+    @Test
+    void findByNameIgnoresCaseAndSurroundingSpaces() {
+        inventory.addProduct(milk());
+
+        Optional<Product> found = inventory.findByName("  piim ");
+
+        assertTrue(found.isPresent());
+        assertEquals("Piim", found.get().getName());
+    }
+
+    @Test
+    void findByNameReturnsEmptyWhenMissing() {
+        inventory.addProduct(milk());
+
+        assertTrue(inventory.findByName("Leib").isEmpty());
+        assertTrue(inventory.findByName(null).isEmpty());
+    }
+
+    @Test
+    void searchByNameFindsPartialMatchesInInsertionOrder() {
+        addThreeProducts();
+
+        List<Product> matches = inventory.searchByName("PII");
+
+        assertEquals(2, matches.size());
+        assertEquals("Piim", matches.get(0).getName());
+        assertEquals("Piimašokolaad", matches.get(1).getName());
+    }
+
+    @Test
+    void searchByNameReturnsEmptyListWhenNothingMatchesOrQueryIsBlank() {
+        addThreeProducts();
+
+        assertTrue(inventory.searchByName("leib").isEmpty());
+        assertTrue(inventory.searchByName("  ").isEmpty());
+        assertTrue(inventory.searchByName(null).isEmpty());
+    }
+
+    @Test
+    void increaseQuantityByName() {
+        inventory.addProduct(milk());
+
+        inventory.increaseQuantity("piim", 5);
+
+        assertEquals(15, inventory.findByName("Piim").get().getQuantity());
+    }
+
+    @Test
+    void decreaseQuantityByName() {
+        inventory.addProduct(milk());
+
+        inventory.decreaseQuantity("Piim", 4);
+
+        assertEquals(6, inventory.findByName("Piim").get().getQuantity());
+    }
+
+    @Test
+    void decreaseBelowZeroIsRejectedAndQuantityStaysTheSame() {
+        inventory.addProduct(milk());
+
+        assertThrows(IllegalArgumentException.class, () -> inventory.decreaseQuantity("Piim", 11));
+        assertEquals(10, inventory.findByName("Piim").get().getQuantity());
+    }
+
+    @Test
+    void changingQuantityOfUnknownProductIsRejected() {
+        assertThrows(IllegalArgumentException.class, () -> inventory.increaseQuantity("Leib", 1));
+        assertThrows(IllegalArgumentException.class, () -> inventory.decreaseQuantity("Leib", 1));
+    }
+
+    @Test
+    void totalValueOfEmptyInventoryIsZero() {
+        assertEquals(0.0, inventory.getTotalValue(), 0.0001);
+    }
+
+    @Test
+    void totalValueSumsPriceTimesQuantityOfAllProducts() {
+        addThreeProducts();
+
+        // 1.20 * 10 + 299.99 * 2 + 2.50 * 4 = 12 + 599.98 + 10 = 621.98
+        assertEquals(621.98, inventory.getTotalValue(), 0.0001);
+    }
+
+    @Test
+    void totalValueFollowsQuantityChanges() {
+        inventory.addProduct(milk());
+
+        inventory.decreaseQuantity("Piim", 10);
+
+        assertEquals(0.0, inventory.getTotalValue(), 0.0001);
     }
 }
