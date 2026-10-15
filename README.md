@@ -14,6 +14,24 @@ See kompileerib koodi ja käivitab rakenduse. Skript leiab Homebrew'ga paigaldat
 Rakendus alustab nelja näidistootega. Menüüst saab tooteid vaadata, lisada, koguseid muuta,
 nime järgi otsida ja laoseisu koguväärtust näha.
 
+## Ekraanipildid
+
+Peamenüü:
+
+![Peamenüü](screenshots/01-menuu.png)
+
+Uue toidutoote lisamine:
+
+![Toote lisamine](screenshots/02-toote-lisamine.png)
+
+Toote otsimine nime osa järgi:
+
+![Otsing](screenshots/03-otsing.png)
+
+Laoseisu koguväärtus:
+
+![Koguväärtus](screenshots/04-koguvaartus.png)
+
 ## Testid
 
 ```
